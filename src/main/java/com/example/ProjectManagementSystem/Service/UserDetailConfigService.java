@@ -1,6 +1,6 @@
 package com.example.ProjectManagementSystem.Service;
 
-import com.example.ProjectManagementSystem.Configuration.UsersIntoUserDetails;
+import com.example.ProjectManagementSystem.Configuration.ConvertUsersIntoUserDetails;
 import com.example.ProjectManagementSystem.Entity.Users;
 import com.example.ProjectManagementSystem.Repository.Usersrepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,7 +18,7 @@ public class UserDetailConfigService implements UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         Optional<Users> user = usersrepository.findByUsername(username);
-        return user.map(UsersIntoUserDetails::new)
+        return user.map(ConvertUsersIntoUserDetails::new)
                 .orElseThrow(()-> new UsernameNotFoundException("User Does Not Exist In This System"));
 
 
