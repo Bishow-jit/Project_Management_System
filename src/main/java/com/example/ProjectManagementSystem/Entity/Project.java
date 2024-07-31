@@ -2,11 +2,13 @@ package com.example.ProjectManagementSystem.Entity;
 
 import com.example.ProjectManagementSystem.Utils.StatusEnum;
 import jakarta.persistence.*;
+import lombok.Data;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDateTime;
 import java.util.Set;
 
+@Data
 @Entity
 @Table(name = "project_tbl")
 public class Project extends BaseModel {
