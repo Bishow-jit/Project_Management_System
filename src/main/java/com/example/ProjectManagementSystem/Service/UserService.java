@@ -14,16 +14,19 @@ public class UserService {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
-    public String registration(Users users){
-        try{
+    public String registration(Users users) {
+        try {
             users.setPassword(passwordEncoder.encode(users.getPassword()));
             Users user = usersrepository.save(users);
-            if(user != null){
+            if (user != null) {
                 return "Registration Successfully";
+            } else {
+                throw new Exception("Registration Failed");
             }
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
+            return "Registration Failed";
         }
-        return "Registration Failed";
+
     }
 }
