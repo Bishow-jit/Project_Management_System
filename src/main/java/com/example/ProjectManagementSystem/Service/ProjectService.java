@@ -1,7 +1,9 @@
 package com.example.ProjectManagementSystem.Service;
 
 import com.example.ProjectManagementSystem.Entity.Project;
+import com.example.ProjectManagementSystem.Entity.Users;
 import com.example.ProjectManagementSystem.Repository.ProjectRepository;
+import com.example.ProjectManagementSystem.Repository.Usersrepository;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,7 +11,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import java.security.Principal;
+import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 
 @Service
 public class ProjectService {
@@ -17,8 +22,16 @@ public class ProjectService {
     @Autowired
     private ProjectRepository projectRepository;
 
-    public ResponseEntity<?> createNewProject(Project project) {
+    @Autowired
+    private JWTService jwtService;
+
+    @Autowired
+    private Usersrepository usersrepository;
+
+    public ResponseEntity<?> createNewProject(Project project, Principal principal) {
         if (project != null) {
+            Optional<Users> loginUser = usersrepository.findByUsername(principal.getName());
+            loginUser.ifPresent(project::setOwner);
             Project project1 = projectRepository.save(project);
             return ResponseEntity.ok(project1);
         }
@@ -34,31 +47,56 @@ public class ProjectService {
         }
     }
 
-    public ResponseEntity<?> getProjectById(Long projectId){
-        Project project = projectRepository.findAllById(projectId).orElseThrow(() ->
-                new EntityNotFoundException("No Project Found With Id:" + projectId));
+    public ResponseEntity<?> getProjectById(Long projectId) {
+        Project project = projectRepository.findAllByIdAndActive(projectId, true).orElseThrow(() ->
+                new EntityNotFoundException("No Active Project Found With Id:" + projectId));
         return ResponseEntity.ok(project);
     }
 
-    public ResponseEntity<?> updateProject(Long projectId, Project project) throws Exception {
-        Project projectToUpdate = projectRepository.findAllById(projectId).orElseThrow(() ->
-                new EntityNotFoundException("No Project Found With Id:" + projectId));
-        if (projectToUpdate.getActive()) {
-            BeanUtils.copyProperties(project, projectToUpdate, "id", "created_at", "created_by");
-            Project projectUpdated = projectRepository.save(projectToUpdate);
-            return ResponseEntity.ok(projectUpdated);
-        } else {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Project Update Failed");
+    public ResponseEntity<?> updateProject(Long projectId, Project project, Principal principal) throws Exception {
+        try {
+            Users loggedUser = usersrepository.findByUsername(principal.getName()).orElseThrow(() -> new EntityNotFoundException("User Not Found"));
+            if (Objects.equals(project.getOwner().getId(), loggedUser.getId())) {
+                Project projectToUpdate = projectRepository.findAllByIdAndActive(projectId, true).orElseThrow(() ->
+                        new EntityNotFoundException("No Project Found With Id:" + projectId));
+                BeanUtils.copyProperties(project, projectToUpdate, "id", "created_at", "created_by",
+                        "project_owner_id");
+                Project projectUpdated = projectRepository.save(projectToUpdate);
+                return ResponseEntity.ok(projectUpdated);
+            }
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Only project owner can delete the project");
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error");
         }
     }
 
-    public ResponseEntity<?>deleteProject(Long projectId){
-        Project projectToDelete = projectRepository.findAllById(projectId).orElseThrow(() ->
+    public ResponseEntity<?> deleteProject(Long projectId, Principal principal) {
+        Project projectToDelete = projectRepository.findById(projectId).orElseThrow(() ->
                 new EntityNotFoundException("No Project Found With Id:" + projectId));
-        if(projectToDelete.getActive()){
+        Users loggedUser = usersrepository.findByUsername(principal.getName()).orElseThrow(() ->
+                new EntityNotFoundException("User Not Found"));
+        if (projectToDelete.getActive() && Objects.equals(projectToDelete.getOwner().getId(), loggedUser.getId())) {
             projectToDelete.setActive(false);
             projectRepository.save(projectToDelete);
+            return ResponseEntity.ok("Project with Id:" + projectId + "Deleted");
         }
-        return ResponseEntity.ok("Project with Id:"+projectId+"Deleted");
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Only project owner can delete the project");
+    }
+
+    public ResponseEntity<?> addMemberToProject(Long projectId, Set<Users> users) {
+        Optional<Project> project = projectRepository.findAllByIdAndActive(projectId, true);
+        try {
+            project.ifPresent(value -> {
+                        value.setMembers(users);
+                        projectRepository.save(value);
+                    }
+            );
+            return ResponseEntity.ok("Member Added Successfully");
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Member adding failed");
+        }
+
     }
 }

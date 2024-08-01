@@ -10,5 +10,5 @@ import java.util.Optional;
 public interface ProjectRepository extends JpaRepository<Project,Long> {
 
     Optional<Project>findAllByActive(Boolean active);
-    Optional<Project> findAllById(Long id);
+    Optional<Project> findAllByIdAndActive(Long id,Boolean active);
 }
