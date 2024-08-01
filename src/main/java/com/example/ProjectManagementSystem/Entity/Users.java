@@ -1,7 +1,12 @@
 package com.example.ProjectManagementSystem.Entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
+
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 @Getter
@@ -33,7 +38,12 @@ public class Users  extends BaseModel{
     @Column(name = "roles")
     private String roles;
 
-    @ManyToOne(fetch = FetchType.LAZY,cascade = CascadeType.ALL)
-    @JoinColumn(name = "project_id",referencedColumnName = "id")
-    private Project project;
+    @JsonBackReference
+    @OneToMany(mappedBy = "owner")
+    private Set<Project> ownedProjects = new HashSet<>();
+
+    @JsonIgnore
+    @ManyToMany(mappedBy = "members")
+    private Set<Project> memberProjects = new HashSet<>();
+
 }
