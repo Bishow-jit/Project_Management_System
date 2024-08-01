@@ -12,6 +12,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.security.Principal;
+import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
@@ -21,10 +23,6 @@ public class ProjectService {
 
     @Autowired
     private ProjectRepository projectRepository;
-
-    @Autowired
-    private JWTService jwtService;
-
     @Autowired
     private Usersrepository usersrepository;
 
@@ -98,5 +96,14 @@ public class ProjectService {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Member adding failed");
         }
 
+    }
+
+    public ResponseEntity<?> getProjectByDateRange(LocalDateTime startDateTime, LocalDateTime endDateTime) {
+
+       List<Project> projectList=projectRepository.getProjectWithinDateRange(startDateTime,endDateTime);
+       if(!projectList.isEmpty()){
+           return ResponseEntity.ok(projectList);
+       }
+       return ResponseEntity.status(HttpStatus.NO_CONTENT).body("No Project Found In This Date Range");
     }
 }

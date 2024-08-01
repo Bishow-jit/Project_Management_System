@@ -17,6 +17,8 @@ public class UserService {
     public String registration(Users users) {
         try {
             users.setPassword(passwordEncoder.encode(users.getPassword()));
+            users.setCreatedBy(users.getUsername());
+            users.setLastModifiedBy(users.getUsername());
             Users user = usersrepository.save(users);
             if (user != null) {
                 return "Registration Successfully";

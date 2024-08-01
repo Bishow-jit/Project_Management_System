@@ -11,6 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Set;
 
@@ -22,17 +23,18 @@ public class ProjectController {
     private ProjectService projectService;
 
     @PostMapping(value = "/create/project", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> createNewProjectRequest(@RequestBody Project project, Principal principal) {
+    public ResponseEntity<?> createNewProjectRequest(@RequestBody Project project,
+                                                     Principal principal) {
         return projectService.createNewProject(project, principal);
 
     }
 
-    @GetMapping(value = "/get/projects")
+    @GetMapping(value = "/projects")
     public ResponseEntity<?> getAllProjectsRequest() {
         return projectService.getAllProjects();
     }
 
-    @GetMapping(value = "/get/peoject")
+    @GetMapping(value = "/project")
     public ResponseEntity<?> getProjectRequest(@Param("id") Long projectId) {
         if (projectId != null) {
             return projectService.getProjectById(projectId);
@@ -65,5 +67,14 @@ public class ProjectController {
             return projectService.addMemberToProject(projectId,users);
         }
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Bad Request");
+    }
+
+    @GetMapping(value = "/project/withinDateRange")
+    public ResponseEntity<?> projectsWithinDateRangeRequest(@Param("StartDateTime") LocalDateTime startDateTime,
+                                                            @Param("EndDateTime") LocalDateTime endDateTime){
+        if(startDateTime!=null && endDateTime != null){
+            return projectService.getProjectByDateRange(startDateTime,endDateTime);
+        }
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("StartDateTime or  EndDateTime missing");
     }
 }
