@@ -1,11 +1,13 @@
 package com.example.ProjectManagementSystem.Entity;
 
 import com.example.ProjectManagementSystem.Utils.StatusEnum;
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.Data;
-import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDateTime;
+import java.util.HashSet;
 import java.util.Set;
 
 @Data
@@ -19,9 +21,6 @@ public class Project extends BaseModel {
     @Column(name = "intro")
     private String intro;
 
-    @Column(name = "owner")
-    private String owner;
-
     @Column(name = "status")
     @Enumerated(EnumType.STRING)
     private StatusEnum status;
@@ -33,6 +32,17 @@ public class Project extends BaseModel {
 
     private LocalDateTime endDateTime;
 
-    @OneToMany(mappedBy = "project")
-    private Set<Users> members;
+
+    @ManyToOne
+    @JoinColumn(name = "project_owner_id",referencedColumnName = "id")
+    private Users owner;
+
+    @ManyToMany
+    @JoinTable(
+            name = "project_members",
+            joinColumns = @JoinColumn(name = "project_id"),
+            inverseJoinColumns = @JoinColumn(name = "user_id")
+    )
+    private Set<Users> members = new HashSet<>();
+
 }
