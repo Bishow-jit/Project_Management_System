@@ -1,7 +1,6 @@
 package com.example.ProjectManagementSystem.Controller;
 
 import com.example.ProjectManagementSystem.Entity.Project;
-import com.example.ProjectManagementSystem.Entity.Users;
 import com.example.ProjectManagementSystem.Service.ProjectService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.repository.query.Param;
@@ -9,11 +8,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.security.Principal;
-import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Set;
 
 @RestController
 @RequestMapping("/api/v1")
@@ -23,18 +17,17 @@ public class ProjectController {
     private ProjectService projectService;
 
     @PostMapping(value = "/create/project", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> createNewProjectRequest(@RequestBody Project project,
-                                                     Principal principal) {
-        return projectService.createNewProject(project, principal);
+    public ResponseEntity<?> createNewProjectRequest(@RequestBody Project project) {
+        return projectService.createNewProject(project);
 
     }
 
-    @GetMapping(value = "/projects")
+    @GetMapping(value = "/get/projects")
     public ResponseEntity<?> getAllProjectsRequest() {
         return projectService.getAllProjects();
     }
 
-    @GetMapping(value = "/project")
+    @GetMapping(value = "/get/peoject")
     public ResponseEntity<?> getProjectRequest(@Param("id") Long projectId) {
         if (projectId != null) {
             return projectService.getProjectById(projectId);
@@ -44,37 +37,18 @@ public class ProjectController {
 
     @PutMapping(value = "/update/project/{id}")
     public ResponseEntity<?> updateProjectRequest(@PathVariable("id") Long projectId,
-                                                  @RequestBody Project project,
-                                                  Principal principal) throws Exception {
+                                                  @RequestBody Project project) throws Exception {
         if (projectId != null && project != null) {
-            return projectService.updateProject(projectId, project ,principal);
+            return projectService.updateProject(projectId, project);
         }
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid Request");
     }
 
     @DeleteMapping(value = "/delete/project")
-    public ResponseEntity<?> deleteProjectRequest(@Param("id") Long id,Principal principal) {
+    public ResponseEntity<?> deleteProjectRequest(@Param("id") Long id) {
         if (id != null) {
-            return projectService.deleteProject(id,principal);
+            return projectService.deleteProject(id);
         }
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Bad Request Id can not be null");
-    }
-
-    @PostMapping(value = "/add/project/members")
-    public ResponseEntity<?> memberAddRequest(@PathVariable("id")Long projectId,
-                                              @RequestBody Set<Users> users){
-        if(projectId!=null && !users.isEmpty()){
-            return projectService.addMemberToProject(projectId,users);
-        }
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Bad Request");
-    }
-
-    @GetMapping(value = "/project/withinDateRange")
-    public ResponseEntity<?> projectsWithinDateRangeRequest(@Param("StartDateTime") LocalDateTime startDateTime,
-                                                            @Param("EndDateTime") LocalDateTime endDateTime){
-        if(startDateTime!=null && endDateTime != null){
-            return projectService.getProjectByDateRange(startDateTime,endDateTime);
-        }
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("StartDateTime or  EndDateTime missing");
     }
 }

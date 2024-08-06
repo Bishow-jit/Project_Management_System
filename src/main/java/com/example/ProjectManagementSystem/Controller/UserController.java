@@ -35,7 +35,7 @@ public class UserController {
 
 
     @PostMapping(value = "/registration", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> registrationRequest(@RequestBody Users users) {
+    public ResponseEntity<?> registration(@RequestBody Users users) {
         return ResponseEntity.status(HttpStatus.OK).body(userService.registration(users));
     }
 

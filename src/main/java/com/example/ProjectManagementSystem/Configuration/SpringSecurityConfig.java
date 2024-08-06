@@ -33,7 +33,7 @@ public class SpringSecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(
                         auth -> {
-                            auth.requestMatchers( "api/v1/login","api/v1/registration").permitAll();
+                            auth.requestMatchers("api/v1/registration", "api/v1/login").permitAll();
                             auth.anyRequest().authenticated();
                         }).formLogin(AbstractAuthenticationFilterConfigurer::permitAll)
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class).build();
