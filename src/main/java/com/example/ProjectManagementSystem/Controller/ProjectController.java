@@ -1,7 +1,8 @@
 package com.example.ProjectManagementSystem.Controller;
 
+import com.example.ProjectManagementSystem.Dto.ProjectDto;
+import com.example.ProjectManagementSystem.Dto.UserDto;
 import com.example.ProjectManagementSystem.Entity.Project;
-import com.example.ProjectManagementSystem.Entity.Users;
 import com.example.ProjectManagementSystem.Service.ProjectService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.repository.query.Param;
@@ -12,7 +13,6 @@ import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
 import java.time.LocalDateTime;
-import java.util.List;
 import java.util.Set;
 
 @RestController
@@ -34,8 +34,8 @@ public class ProjectController {
         return projectService.getAllProjects();
     }
 
-    @GetMapping(value = "/project")
-    public ResponseEntity<?> getProjectRequest(@Param("id") Long projectId) {
+    @GetMapping(value = "/project/{id}")
+    public ResponseEntity<?> getProjectRequest(@PathVariable("id") Long projectId) {
         if (projectId != null) {
             return projectService.getProjectById(projectId);
         }
@@ -44,10 +44,10 @@ public class ProjectController {
 
     @PutMapping(value = "/update/project/{id}")
     public ResponseEntity<?> updateProjectRequest(@PathVariable("id") Long projectId,
-                                                  @RequestBody Project project,
+                                                  @RequestBody ProjectDto projectDto,
                                                   Principal principal) throws Exception {
-        if (projectId != null && project != null) {
-            return projectService.updateProject(projectId, project ,principal);
+        if (projectId != null && projectDto != null) {
+            return projectService.updateProject(projectId, projectDto,principal);
         }
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid Request");
     }
@@ -60,11 +60,11 @@ public class ProjectController {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Bad Request Id can not be null");
     }
 
-    @PostMapping(value = "/add/project/members")
+    @PostMapping(value = "/add/project/members/{id}")
     public ResponseEntity<?> memberAddRequest(@PathVariable("id")Long projectId,
-                                              @RequestBody Set<Users> users){
-        if(projectId!=null && !users.isEmpty()){
-            return projectService.addMemberToProject(projectId,users);
+                                              @RequestBody Set<UserDto> userDto){
+        if(projectId!=null && !userDto.isEmpty()){
+            return projectService.addMemberToProject(projectId,userDto);
         }
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Bad Request");
     }

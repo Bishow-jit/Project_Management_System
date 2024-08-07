@@ -1,7 +1,8 @@
 package com.example.ProjectManagementSystem.Controller;
 
 import com.example.ProjectManagementSystem.Dto.LoginForm;
-import com.example.ProjectManagementSystem.Entity.Users;
+import com.example.ProjectManagementSystem.Dto.LoginResDto;
+import com.example.ProjectManagementSystem.Dto.UserCreateDto;
 import com.example.ProjectManagementSystem.Service.JWTService;
 import com.example.ProjectManagementSystem.Service.UserDetailConfigService;
 import com.example.ProjectManagementSystem.Service.UserService;
@@ -35,23 +36,28 @@ public class UserController {
 
 
     @PostMapping(value = "/registration", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> registrationRequest(@RequestBody Users users) {
-        return ResponseEntity.status(HttpStatus.OK).body(userService.registration(users));
+    public ResponseEntity<?> registrationRequest(@RequestBody UserCreateDto userCreateDto) {
+        return ResponseEntity.status(HttpStatus.OK).body(userService.registration(userCreateDto));
     }
 
     @PostMapping(value = "/login", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public String login(@RequestBody LoginForm loginForm) throws UsernameNotFoundException {
+    public ResponseEntity<?> login(@RequestBody LoginForm loginForm) throws UsernameNotFoundException {
         try {
             Authentication authentication = authenticationManager
                     .authenticate(new UsernamePasswordAuthenticationToken(loginForm.username(), loginForm.password()));
             if (authentication.isAuthenticated()) {
-                return jwtService.generateToken(userDetailConfigService.loadUserByUsername(loginForm.username()));
+                LoginResDto loginResDto = new LoginResDto();
+                loginResDto.setAccessToken(jwtService.generateToken(userDetailConfigService.loadUserByUsername(loginForm.username())));
+                loginResDto.setIsTokenValid(jwtService.isTokenValid(loginResDto.getAccessToken()));
+                loginResDto.setMessage("Success");
+                return ResponseEntity.status(HttpStatus.OK).body(loginResDto);
+
             } else {
                 throw new UsernameNotFoundException("User Not Found");
             }
         } catch (Exception e) {
             e.printStackTrace();
-            return "Login Failed !! Invalid Username or Password !!";
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Login Failed !! Invalid Username or Password !!");
         }
     }
 

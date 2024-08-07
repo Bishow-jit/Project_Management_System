@@ -1,10 +1,14 @@
 package com.example.ProjectManagementSystem.Service;
 
+import com.example.ProjectManagementSystem.Dto.ProjectDto;
+import com.example.ProjectManagementSystem.Dto.UserDto;
 import com.example.ProjectManagementSystem.Entity.Project;
 import com.example.ProjectManagementSystem.Entity.Users;
 import com.example.ProjectManagementSystem.Repository.ProjectRepository;
 import com.example.ProjectManagementSystem.Repository.Usersrepository;
+import com.example.ProjectManagementSystem.Utils.StatusEnum;
 import jakarta.persistence.EntityNotFoundException;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -17,6 +21,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 public class ProjectService {
@@ -26,41 +31,60 @@ public class ProjectService {
     @Autowired
     private Usersrepository usersrepository;
 
+    @Autowired
+    private ModelMapper modelMapper;
+
     public ResponseEntity<?> createNewProject(Project project, Principal principal) {
         if (project != null) {
-            Optional<Users> loginUser = usersrepository.findByUsername(principal.getName());
-            loginUser.ifPresent(project::setOwner);
-            Project project1 = projectRepository.save(project);
-            return ResponseEntity.ok(project1);
+            Users loginUser = usersrepository.findByUsername(principal.getName()).orElseThrow(() ->
+                    new EntityNotFoundException("User Not Found"));
+            if (project.getOwner() == null) {
+                project.setOwner(loginUser);
+            }
+            if(project.getStatus()== StatusEnum.PRE){
+                project.setStartDateTime(null);
+                project.setEndDateTime(null);
+            }
+            projectRepository.save(project);
+            return ResponseEntity.ok("Project Created Successfully");
+
         }
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("New Project Creation Failed");
     }
 
     public ResponseEntity<?> getAllProjects() {
-        Optional<Project> allActiveProjects = projectRepository.findAllByActive(Boolean.TRUE);
-        if (allActiveProjects.isPresent()) {
-            return ResponseEntity.ok(allActiveProjects);
+        List<Project> allActiveProjects = projectRepository.findAllByActiveTrue();
+        List<ProjectDto> projectDtoList = allActiveProjects.stream()
+                .map(project -> modelMapper.map(project, ProjectDto.class)).toList();
+        if (!projectDtoList.isEmpty()) {
+            return ResponseEntity.ok(projectDtoList);
         } else {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("No Projects Found");
         }
     }
 
     public ResponseEntity<?> getProjectById(Long projectId) {
-        Project project = projectRepository.findAllByIdAndActive(projectId, true).orElseThrow(() ->
-                new EntityNotFoundException("No Active Project Found With Id:" + projectId));
-        return ResponseEntity.ok(project);
+        Optional<Project>project = projectRepository.findAllByIdAndActiveTrue(projectId);
+        if(project.isPresent()){
+            ProjectDto projectDto = modelMapper.map(project.get(),ProjectDto.class);
+            return ResponseEntity.ok(projectDto);
+        }else {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("No Active Project Found With Id:" + projectId);
+        }
+
     }
 
-    public ResponseEntity<?> updateProject(Long projectId, Project project, Principal principal) throws Exception {
+    public ResponseEntity<?> updateProject(Long projectId, ProjectDto projectDto, Principal principal) throws Exception {
         try {
             Users loggedUser = usersrepository.findByUsername(principal.getName()).orElseThrow(() -> new EntityNotFoundException("User Not Found"));
-            if (Objects.equals(project.getOwner().getId(), loggedUser.getId())) {
-                Project projectToUpdate = projectRepository.findAllByIdAndActive(projectId, true).orElseThrow(() ->
+            if (Objects.equals(projectDto.getOwner().getId(), loggedUser.getId())) {
+                Project projectToUpdate = projectRepository.findAllByIdAndActiveTrue(projectId).orElseThrow(() ->
                         new EntityNotFoundException("No Project Found With Id:" + projectId));
-                BeanUtils.copyProperties(project, projectToUpdate, "id", "created_at", "created_by",
+                BeanUtils.copyProperties(projectDto, projectToUpdate, "id", "created_at", "created_by",
                         "project_owner_id");
                 Project projectUpdated = projectRepository.save(projectToUpdate);
-                return ResponseEntity.ok(projectUpdated);
+                ProjectDto UpdatedProjectDto = modelMapper.map(projectUpdated,ProjectDto.class);
+                return ResponseEntity.ok(UpdatedProjectDto);
             }
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Only project owner can delete the project");
         } catch (Exception e) {
@@ -82,11 +106,13 @@ public class ProjectService {
         return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Only project owner can delete the project");
     }
 
-    public ResponseEntity<?> addMemberToProject(Long projectId, Set<Users> users) {
-        Optional<Project> project = projectRepository.findAllByIdAndActive(projectId, true);
+    public ResponseEntity<?> addMemberToProject(Long projectId, Set<UserDto> userDtos) {
+        Optional<Project> project = projectRepository.findAllByIdAndActiveTrue(projectId);
+        Set<Users> usersSet = userDtos.stream().map(userDto -> modelMapper.map(userDto,Users.class))
+                .collect(Collectors.toSet());
         try {
             project.ifPresent(value -> {
-                        value.setMembers(users);
+                        value.setMembers(usersSet);
                         projectRepository.save(value);
                     }
             );

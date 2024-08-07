@@ -13,8 +13,8 @@ import java.util.Optional;
 @Repository
 public interface ProjectRepository extends JpaRepository<Project,Long> {
 
-    Optional<Project>findAllByActive(Boolean active);
-    Optional<Project> findAllByIdAndActive(Long id,Boolean active);
+    List<Project> findAllByActiveTrue();
+    Optional<Project> findAllByIdAndActiveTrue(Long id);
 
     @Query(value = "SELECT * FROM project_tbl WHERE start_date_time >= :startDateTime and end_date_time <= :endDateTime and active = true",
             nativeQuery = true)

@@ -1,7 +1,6 @@
 package com.example.ProjectManagementSystem.Entity;
 
 import com.example.ProjectManagementSystem.Utils.StatusEnum;
-import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.Data;
@@ -32,7 +31,7 @@ public class Project extends BaseModel {
 
     private LocalDateTime endDateTime;
 
-
+    @JsonManagedReference
     @ManyToOne
     @JoinColumn(name = "project_owner_id",referencedColumnName = "id")
     private Users owner;

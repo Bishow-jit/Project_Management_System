@@ -1,12 +1,9 @@
 package com.example.ProjectManagementSystem.Entity;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.util.HashSet;
 import java.util.Set;
 
 @Entity
@@ -39,6 +36,7 @@ public class Users  extends BaseModel{
     @Column(name = "roles")
     private String roles;
 
+    @JsonBackReference
     @OneToMany(mappedBy = "owner")
     private Set<Project> ownedProjects;
 
