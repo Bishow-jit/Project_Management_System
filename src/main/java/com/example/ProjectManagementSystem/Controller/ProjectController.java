@@ -13,8 +13,10 @@ import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Set;
 
+@CrossOrigin(origins = "*")
 @RestController
 @RequestMapping("/api/v1")
 public class ProjectController {
@@ -53,7 +55,7 @@ public class ProjectController {
     }
 
     @DeleteMapping(value = "/delete/project")
-    public ResponseEntity<?> deleteProjectRequest(@Param("id") Long id,Principal principal) {
+    public ResponseEntity<?> deleteProjectRequest(@RequestParam("id") Long id,Principal principal) {
         if (id != null) {
             return projectService.deleteProject(id,principal);
         }
@@ -70,11 +72,17 @@ public class ProjectController {
     }
 
     @GetMapping(value = "/project/withinDateRange")
-    public ResponseEntity<?> projectsWithinDateRangeRequest(@Param("StartDateTime") LocalDateTime startDateTime,
-                                                            @Param("EndDateTime") LocalDateTime endDateTime){
-        if(startDateTime!=null && endDateTime != null){
-            return projectService.getProjectByDateRange(startDateTime,endDateTime);
+    public ResponseEntity<?> projectsWithinDateRangeRequest(@RequestParam("StartDateTime") String startDateTime,
+                                                            @RequestParam("EndDateTime") String endDateTime){
+        try {
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss");
+
+            LocalDateTime start = LocalDateTime.parse(startDateTime, formatter);
+            LocalDateTime end = LocalDateTime.parse(endDateTime, formatter);
+
+            return projectService.getProjectByDateRange(start, end);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid date format");
         }
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("StartDateTime or  EndDateTime missing");
     }
 }

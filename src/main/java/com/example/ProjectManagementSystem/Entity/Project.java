@@ -42,6 +42,8 @@ public class Project extends BaseModel {
             joinColumns = @JoinColumn(name = "project_id"),
             inverseJoinColumns = @JoinColumn(name = "user_id")
     )
+
+    @JsonManagedReference
     private Set<Users> members = new HashSet<>();
 
 }

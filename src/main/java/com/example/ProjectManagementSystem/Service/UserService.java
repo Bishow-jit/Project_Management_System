@@ -31,8 +31,7 @@ public class UserService {
         try {
             userCreateDto.setPassword(passwordEncoder.encode(userCreateDto.getPassword()));
             Users users = modelMapper.map(userCreateDto,Users.class);
-            users.setCreatedBy(userCreateDto.getUsername());
-            users.setLastModifiedBy(userCreateDto.getUsername());
+            users.setRoles("ROLE_USER");
             Users user = usersrepository.save(users);
             if (user != null) {
                 return "Registration Successfully";

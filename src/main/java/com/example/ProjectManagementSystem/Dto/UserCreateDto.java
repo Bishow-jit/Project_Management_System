@@ -5,7 +5,6 @@ import lombok.Data;
 @Data
 public class UserCreateDto {
 
-
     private String username;
 
     private String password;
@@ -17,6 +16,4 @@ public class UserCreateDto {
     private Long mobileNo;
 
     private String gender;
-
-    private String roles;
 }

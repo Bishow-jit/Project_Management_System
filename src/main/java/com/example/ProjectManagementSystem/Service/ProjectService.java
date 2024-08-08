@@ -41,10 +41,6 @@ public class ProjectService {
             if (project.getOwner() == null) {
                 project.setOwner(loginUser);
             }
-            if(project.getStatus()== StatusEnum.PRE){
-                project.setStartDateTime(null);
-                project.setEndDateTime(null);
-            }
             projectRepository.save(project);
             return ResponseEntity.ok("Project Created Successfully");
 
@@ -130,6 +126,6 @@ public class ProjectService {
        if(!projectList.isEmpty()){
            return ResponseEntity.ok(projectList);
        }
-       return ResponseEntity.status(HttpStatus.NO_CONTENT).body("No Project Found In This Date Range");
+       return ResponseEntity.status(HttpStatus.NOT_FOUND).body("No Project Found In This Date Range");
     }
 }

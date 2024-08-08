@@ -40,6 +40,7 @@ public class Users  extends BaseModel{
     @OneToMany(mappedBy = "owner")
     private Set<Project> ownedProjects;
 
+    @JsonBackReference
     @ManyToMany(mappedBy = "members")
     private Set<Project> memberProjects;
 
