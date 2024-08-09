@@ -25,9 +25,9 @@ public class ProjectController {
     private ProjectService projectService;
 
     @PostMapping(value = "/create/project", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> createNewProjectRequest(@RequestBody Project project,
+    public ResponseEntity<?> createNewProjectRequest(@RequestBody ProjectDto projectDto,
                                                      Principal principal) {
-        return projectService.createNewProject(project, principal);
+        return projectService.createNewProject(projectDto, principal);
 
     }
 

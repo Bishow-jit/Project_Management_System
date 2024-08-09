@@ -1,6 +1,7 @@
 package com.example.ProjectManagementSystem.Service;
 
 import com.example.ProjectManagementSystem.Dto.ProjectDto;
+import com.example.ProjectManagementSystem.Dto.ResponseDto;
 import com.example.ProjectManagementSystem.Dto.UserDto;
 import com.example.ProjectManagementSystem.Entity.Project;
 import com.example.ProjectManagementSystem.Entity.Users;
@@ -34,18 +35,24 @@ public class ProjectService {
     @Autowired
     private ModelMapper modelMapper;
 
-    public ResponseEntity<?> createNewProject(Project project, Principal principal) {
-        if (project != null) {
+    public ResponseEntity<?> createNewProject(ProjectDto projectDto, Principal principal) {
+        ResponseDto res = new ResponseDto();
+        if (projectDto != null) {
             Users loginUser = usersrepository.findByUsername(principal.getName()).orElseThrow(() ->
                     new EntityNotFoundException("User Not Found"));
-            if (project.getOwner() == null) {
-                project.setOwner(loginUser);
+            if (projectDto.getOwner() == null) {
+                UserDto userDto = modelMapper.map(loginUser,UserDto.class);
+                projectDto.setOwner(userDto);
             }
-            projectRepository.save(project);
-            return ResponseEntity.ok("Project Created Successfully");
+            Project projectToBeSaved = modelMapper.map(projectDto,Project.class);
+            Project savedProject = projectRepository.save(projectToBeSaved);
+            res.setData(savedProject);
+            res.setMsg("Project Created Successfully");
+            return ResponseEntity.ok(res);
 
         }
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("New Project Creation Failed");
+        res.setMsg("New Project Creation Failed");
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(res);
     }
 
     public ResponseEntity<?> getAllProjects() {

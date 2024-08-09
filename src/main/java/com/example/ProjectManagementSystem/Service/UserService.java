@@ -1,5 +1,6 @@
 package com.example.ProjectManagementSystem.Service;
 
+import com.example.ProjectManagementSystem.Dto.ResponseDto;
 import com.example.ProjectManagementSystem.Dto.UserCreateDto;
 import com.example.ProjectManagementSystem.Dto.UserDto;
 import com.example.ProjectManagementSystem.Entity.Users;
@@ -27,20 +28,20 @@ public class UserService {
     @Autowired
     private ModelMapper modelMapper;
 
-    public String registration(UserCreateDto userCreateDto) {
+    public ResponseDto registration(UserCreateDto userCreateDto) {
+        ResponseDto res = new ResponseDto();
         try {
             userCreateDto.setPassword(passwordEncoder.encode(userCreateDto.getPassword()));
             Users users = modelMapper.map(userCreateDto,Users.class);
             users.setRoles("ROLE_USER");
             Users user = usersrepository.save(users);
-            if (user != null) {
-                return "Registration Successfully";
-            } else {
-                throw new Exception("Registration Failed");
-            }
+            res.setData(user);
+            res.setMsg("Registration Successfully");
+            return res;
         } catch (Exception e) {
             e.printStackTrace();
-            return "Registration Failed";
+            res.setMsg("Registration Failed");
+            return res;
         }
 
     }
