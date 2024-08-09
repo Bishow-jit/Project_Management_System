@@ -110,19 +110,24 @@ public class ProjectService {
     }
 
     public ResponseEntity<?> addMemberToProject(Long projectId, Set<UserDto> userDtos) {
+        ResponseDto res = new ResponseDto();
         Optional<Project> project = projectRepository.findAllByIdAndActiveTrue(projectId);
         Set<Users> usersSet = userDtos.stream().map(userDto -> modelMapper.map(userDto,Users.class))
                 .collect(Collectors.toSet());
         try {
             project.ifPresent(value -> {
                         value.setMembers(usersSet);
-                        projectRepository.save(value);
+                        Project projectSaved = projectRepository.save(value);
+                        res.setData(projectSaved);
+
                     }
             );
-            return ResponseEntity.ok("Member Added Successfully");
+            res.setMsg("Member Added Successfully");
+            return ResponseEntity.ok(res);
         } catch (Exception e) {
             e.printStackTrace();
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Member adding failed");
+            res.setMsg("Member Adding Failed");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(res);
         }
 
     }
