@@ -97,16 +97,20 @@ public class ProjectService {
     }
 
     public ResponseEntity<?> deleteProject(Long projectId, Principal principal) {
+        ResponseDto res = new ResponseDto();
         Project projectToDelete = projectRepository.findById(projectId).orElseThrow(() ->
                 new EntityNotFoundException("No Project Found With Id:" + projectId));
         Users loggedUser = usersrepository.findByUsername(principal.getName()).orElseThrow(() ->
                 new EntityNotFoundException("User Not Found"));
         if (projectToDelete.getActive() && Objects.equals(projectToDelete.getOwner().getId(), loggedUser.getId())) {
             projectToDelete.setActive(false);
-            projectRepository.save(projectToDelete);
-            return ResponseEntity.ok("Project with Id:" + projectId + "Deleted");
+            Project project =projectRepository.save(projectToDelete);
+            res.setData(project);
+            res.setMsg("Project named :" + project.getName() +" Deleted");
+            return ResponseEntity.ok(res);
         }
-        return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Only project owner can delete the project");
+        res.setMsg("Only project owner can delete the project");
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(res);
     }
 
     public ResponseEntity<?> addMemberToProject(Long projectId, Set<UserDto> userDtos) {
@@ -114,6 +118,10 @@ public class ProjectService {
         Optional<Project> project = projectRepository.findAllByIdAndActiveTrue(projectId);
         Set<Users> usersSet = userDtos.stream().map(userDto -> modelMapper.map(userDto,Users.class))
                 .collect(Collectors.toSet());
+        if(project.isPresent()){
+            Set<Users> existingMembers = project.get().getMembers();
+            usersSet.addAll(existingMembers);
+        }
         try {
             project.ifPresent(value -> {
                         value.setMembers(usersSet);

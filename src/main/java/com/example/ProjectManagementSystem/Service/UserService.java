@@ -9,12 +9,14 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.security.Principal;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -60,5 +62,17 @@ public class UserService {
             e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error while getting Users");
         }
+    }
+
+    public ResponseEntity<?> getLoggedInUser(String userName) {
+            try {
+                Optional<Users> user = usersrepository.findByUsername(userName);
+                if(user.isPresent()){
+                    return ResponseEntity.ok(user.get());
+                }
+            }catch (Exception e){
+                e.printStackTrace();
+            }
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Invalid Request");
     }
 }
