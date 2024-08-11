@@ -38,7 +38,7 @@ public class UserController {
 
     @PostMapping(value = "/registration", consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> registrationRequest(@RequestBody UserCreateDto userCreateDto) {
-        return ResponseEntity.status(HttpStatus.OK).body(userService.registration(userCreateDto));
+        return ResponseEntity.ok(userService.registration(userCreateDto));
     }
 
     @PostMapping(value = "/login", consumes = MediaType.APPLICATION_JSON_VALUE)
@@ -62,6 +62,11 @@ public class UserController {
         }
     }
 
+
+    @GetMapping(value = "/getUsers")
+    public ResponseEntity<?> getAllUsers(){
+        return userService.getUsers();
+    }
     @GetMapping(value = "/getAllUsers")
     public ResponseEntity<?> getAllUsersWithoutLoggedInUserRequest(Principal principal){
         return userService.getAllUsersWithoutLoggedInUser(principal);

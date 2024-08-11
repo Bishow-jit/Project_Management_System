@@ -15,7 +15,7 @@ import java.util.Set;
 @Table(name = "users_tbl")
 public class Users  extends BaseModel{
 
-    @Column(name = "username")
+    @Column(name = "username",unique = true)
     private String username;
 
     @Column(name = "password")

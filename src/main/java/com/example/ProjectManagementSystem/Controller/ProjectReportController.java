@@ -18,7 +18,7 @@ public class ProjectReportController    {
 
     @GetMapping("project/report/{format}")
     public ResponseEntity<byte[]> generateReport(@PathVariable String format) throws IOException, JRException {
-        System.out.println("-------Pdf is generated------");
+        System.out.println("-------Pdf is generating------");
         return projectReportService.exportReport(format);
 
     }
