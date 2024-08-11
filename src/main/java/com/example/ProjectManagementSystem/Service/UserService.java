@@ -76,20 +76,5 @@ public class UserService {
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Invalid Request");
     }
 
-    public ResponseEntity<?> getUsers() {
-        ResponseDto res = new ResponseDto();
-        try{
-            List<Users> usersList=usersrepository.findAll();
-            List<UserDto> userDtoList = usersList.stream()
-                    .map(user -> modelMapper.map(user, UserDto.class))
-                    .collect(Collectors.toList());
-            res.setData(userDtoList);
-            res.setMsg("All Users Data");
-            return ResponseEntity.ok(res);
-        }catch (Exception e){
-            e.printStackTrace();
-            res.setMsg("Error Occurred");
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(res);
-        }
-    }
+
 }

@@ -2,7 +2,10 @@ package com.example.ProjectManagementSystem.Controller;
 
 import com.example.ProjectManagementSystem.Dto.LoginForm;
 import com.example.ProjectManagementSystem.Dto.LoginResDto;
+import com.example.ProjectManagementSystem.Dto.ResponseDto;
 import com.example.ProjectManagementSystem.Dto.UserCreateDto;
+import com.example.ProjectManagementSystem.Entity.Users;
+import com.example.ProjectManagementSystem.Repository.Usersrepository;
 import com.example.ProjectManagementSystem.Service.JWTService;
 import com.example.ProjectManagementSystem.Service.UserDetailConfigService;
 import com.example.ProjectManagementSystem.Service.UserService;
@@ -17,6 +20,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
+import java.util.Optional;
 
 @CrossOrigin(origins = "*")
 @RestController
@@ -35,9 +39,18 @@ public class UserController {
     @Autowired
     private UserDetailConfigService userDetailConfigService;
 
+    @Autowired
+    private Usersrepository usersrepository;
+
 
     @PostMapping(value = "/registration", consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> registrationRequest(@RequestBody UserCreateDto userCreateDto) {
+        Optional<Users> user = usersrepository.findByUsername(userCreateDto.getUsername());
+        if(user.isPresent()){
+            ResponseDto responseDto = new ResponseDto();
+            responseDto.setMsg("Username Unavailable.Try With Another Username");
+            return ResponseEntity.ok(responseDto);
+        }
         return ResponseEntity.ok(userService.registration(userCreateDto));
     }
 
@@ -62,11 +75,6 @@ public class UserController {
         }
     }
 
-
-    @GetMapping(value = "/getUsers")
-    public ResponseEntity<?> getAllUsers(){
-        return userService.getUsers();
-    }
     @GetMapping(value = "/getAllUsers")
     public ResponseEntity<?> getAllUsersWithoutLoggedInUserRequest(Principal principal){
         return userService.getAllUsersWithoutLoggedInUser(principal);
