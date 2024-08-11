@@ -2,10 +2,8 @@ package com.example.ProjectManagementSystem.Controller;
 
 import com.example.ProjectManagementSystem.Dto.ProjectDto;
 import com.example.ProjectManagementSystem.Dto.UserDto;
-import com.example.ProjectManagementSystem.Entity.Project;
 import com.example.ProjectManagementSystem.Service.ProjectService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.repository.query.Param;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
