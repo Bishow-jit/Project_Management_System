@@ -19,7 +19,7 @@ public class JWTService {
 
     private static final String SECRET_KEY = "437AEB36C3C0E039B81EFC6CDA789F4665A03C07C9D00278CAB7A833F3B7D0E7";
 
-    public static final Long TOKEN_VALIDITY = TimeUnit.MINUTES.toMillis(60);
+    public static final Long TOKEN_VALIDITY = TimeUnit.MINUTES.toMillis(30);
 
     public String generateToken(UserDetails userDetails) {
         Map<String, String> claims = new HashMap<>();
