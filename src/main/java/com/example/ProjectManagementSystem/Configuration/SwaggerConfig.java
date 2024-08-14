@@ -19,7 +19,7 @@ public class SwaggerConfig {
                 .components(new Components().addSecuritySchemes
                         ("Bearer Authentication", createAPIKeyScheme()))
                 .info(new Info().title("PMS API")
-                        .description("API of Project Management System.")
+                        .description("Backend API Of Project Management System.")
                         .version("1.0").contact(new Contact().name("Bishowjit")));
     }
 
