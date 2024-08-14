@@ -1,6 +1,6 @@
 package com.example.ProjectManagementSystem.Controller;
 
-import com.example.ProjectManagementSystem.Dto.LoginForm;
+import com.example.ProjectManagementSystem.Dto.LoginDto;
 import com.example.ProjectManagementSystem.Dto.LoginResDto;
 import com.example.ProjectManagementSystem.Dto.ResponseDto;
 import com.example.ProjectManagementSystem.Dto.UserCreateDto;
@@ -55,13 +55,13 @@ public class UserController {
     }
 
     @PostMapping(value = "/login", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> login(@RequestBody LoginForm loginForm) throws UsernameNotFoundException {
+    public ResponseEntity<?> login(@RequestBody LoginDto loginDto) throws UsernameNotFoundException {
         try {
             Authentication authentication = authenticationManager
-                    .authenticate(new UsernamePasswordAuthenticationToken(loginForm.username(), loginForm.password()));
+                    .authenticate(new UsernamePasswordAuthenticationToken(loginDto.getUsername(), loginDto.getPassword()));
             if (authentication.isAuthenticated()) {
                 LoginResDto loginResDto = new LoginResDto();
-                loginResDto.setAccessToken(jwtService.generateToken(userDetailConfigService.loadUserByUsername(loginForm.username())));
+                loginResDto.setAccessToken(jwtService.generateToken(userDetailConfigService.loadUserByUsername(loginDto.getUsername())));
                 loginResDto.setIsTokenValid(jwtService.isTokenValid(loginResDto.getAccessToken()));
                 loginResDto.setMessage("Success");
                 return ResponseEntity.status(HttpStatus.OK).body(loginResDto);
