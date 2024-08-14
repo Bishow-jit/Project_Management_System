@@ -68,7 +68,8 @@ public class UserService {
             try {
                 Optional<Users> user = usersrepository.findByUsername(userName);
                 if(user.isPresent()){
-                    return ResponseEntity.ok(user.get());
+                    UserDto userDto = modelMapper.map(user.get(),UserDto.class);
+                    return ResponseEntity.ok(userDto);
                 }
             }catch (Exception e){
                 e.printStackTrace();
