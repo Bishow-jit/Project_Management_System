@@ -30,7 +30,7 @@ public class ProjectReportService {
 
     public ResponseEntity<byte[]> exportReport(String reportFromat) throws IOException, JRException {
 
-        String path = "C:\\Users\\DELL\\Documents\\Report";
+        String path = "C:\\Users\\Public\\Documents";
         List<Project> pa = projectRepository.findAllByActiveTrue();
 
 
