@@ -67,15 +67,19 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public ResponseEntity<?> getLoggedInUser(String userName) {
+        ResponseDto res = new ResponseDto();
         try {
             Optional<Users> user = usersRepository.findByUsername(userName);
             if (user.isPresent()) {
                 UserDto userDto = modelMapper.map(user.get(), UserDto.class);
-                return ResponseEntity.ok(userDto);
+                res.setData(userDto);
+                res.setMsg("User Data Retrieved Successfully");
+                return ResponseEntity.ok(res);
             }
         } catch (Exception e) {
             e.printStackTrace();
         }
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Invalid Request");
+        res.setMsg("Invalid Request");
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(res);
     }
 }
