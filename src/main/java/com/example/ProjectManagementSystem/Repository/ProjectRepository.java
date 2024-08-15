@@ -11,13 +11,15 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
-public interface ProjectRepository extends JpaRepository<Project,Long> {
+public interface ProjectRepository extends JpaRepository<Project, Long> {
 
     List<Project> findAllByActiveTrue();
+
     Optional<Project> findAllByIdAndActiveTrue(Long id);
 
-    @Query(value = "SELECT * FROM project_tbl WHERE (start_date_time between :startDateTime and :endDateTime or end_date_time between :startDateTime and :endDateTime) and active = true;",
+    @Query(value = "SELECT * FROM project_tbl WHERE (start_date_time between :startDateTime and :endDateTime or " +
+            "end_date_time between :startDateTime and :endDateTime) and active = true;",
             nativeQuery = true)
-    List<Project>getProjectWithinDateRange(@Param("startDateTime")LocalDateTime startDateTime,
-                                          @Param("endDateTime")LocalDateTime endDateTime);
+    List<Project> getProjectWithinDateRange(@Param("startDateTime") LocalDateTime startDateTime,
+                                            @Param("endDateTime") LocalDateTime endDateTime);
 }

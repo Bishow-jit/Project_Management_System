@@ -6,6 +6,8 @@ import lombok.Data;
 public class LoginResDto {
 
     private String accessToken;
+
     private Boolean isTokenValid;
+
     private String message;
 }

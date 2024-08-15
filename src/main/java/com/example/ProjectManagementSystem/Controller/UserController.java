@@ -5,7 +5,7 @@ import com.example.ProjectManagementSystem.Dto.LoginResDto;
 import com.example.ProjectManagementSystem.Dto.ResponseDto;
 import com.example.ProjectManagementSystem.Dto.UserCreateDto;
 import com.example.ProjectManagementSystem.Entity.Users;
-import com.example.ProjectManagementSystem.Repository.Usersrepository;
+import com.example.ProjectManagementSystem.Repository.UsersRepository;
 import com.example.ProjectManagementSystem.Service.JWTService;
 import com.example.ProjectManagementSystem.Service.UserDetailConfigService;
 import com.example.ProjectManagementSystem.Service.UserService;
@@ -40,13 +40,13 @@ public class UserController {
     private UserDetailConfigService userDetailConfigService;
 
     @Autowired
-    private Usersrepository usersrepository;
+    private UsersRepository usersRepository;
 
 
     @PostMapping(value = "/registration", consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> registrationRequest(@RequestBody UserCreateDto userCreateDto) {
-        Optional<Users> user = usersrepository.findByUsername(userCreateDto.getUsername());
-        if(user.isPresent()){
+        Optional<Users> user = usersRepository.findByUsername(userCreateDto.getUsername());
+        if (user.isPresent()) {
             ResponseDto responseDto = new ResponseDto();
             responseDto.setMsg("Username Unavailable.Try With Another Username");
             return ResponseEntity.ok(responseDto);
@@ -76,7 +76,7 @@ public class UserController {
     }
 
     @GetMapping(value = "/getAllUsers")
-    public ResponseEntity<?> getAllUsersWithoutLoggedInUserRequest(Principal principal){
+    public ResponseEntity<?> getAllUsersWithoutLoggedInUserRequest(Principal principal) {
         return userService.getAllUsersWithoutLoggedInUser(principal);
     }
 

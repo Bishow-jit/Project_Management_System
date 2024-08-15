@@ -11,7 +11,7 @@ import java.io.IOException;
 @CrossOrigin(origins = "*")
 @RestController
 @RequestMapping("/api/v1")
-public class ProjectReportController    {
+public class ProjectReportController {
 
     @Autowired
     private ProjectReportService projectReportService;

@@ -15,9 +15,9 @@ public class ConvertUsersIntoUserDetails implements UserDetails {
     private String password;
     private List<GrantedAuthority> authorities;
 
-    public ConvertUsersIntoUserDetails(Users users){
-        username=users.getUsername();
-        password=users.getPassword();
+    public ConvertUsersIntoUserDetails(Users users) {
+        username = users.getUsername();
+        password = users.getPassword();
         authorities = Arrays.stream(users.getRoles().split(","))
                 .map(SimpleGrantedAuthority::new)
                 .collect(Collectors.toList());

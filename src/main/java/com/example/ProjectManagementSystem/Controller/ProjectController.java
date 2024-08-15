@@ -47,31 +47,31 @@ public class ProjectController {
                                                   @RequestBody ProjectDto projectDto,
                                                   Principal principal) throws Exception {
         if (projectId != null && projectDto != null) {
-            return projectService.updateProject(projectId, projectDto,principal);
+            return projectService.updateProject(projectId, projectDto, principal);
         }
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid Request");
     }
 
     @DeleteMapping(value = "/delete/project")
-    public ResponseEntity<?> deleteProjectRequest(@RequestParam("id") Long id,Principal principal) {
+    public ResponseEntity<?> deleteProjectRequest(@RequestParam("id") Long id, Principal principal) {
         if (id != null) {
-            return projectService.deleteProject(id,principal);
+            return projectService.deleteProject(id, principal);
         }
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Bad Request Id can not be null");
     }
 
     @PostMapping(value = "/add/project/members/{id}")
-    public ResponseEntity<?> memberAddRequest(@PathVariable("id")Long projectId,
-                                              @RequestBody Set<UserDto> userDto){
-        if(projectId!=null && !userDto.isEmpty()){
-            return projectService.addMemberToProject(projectId,userDto);
+    public ResponseEntity<?> memberAddRequest(@PathVariable("id") Long projectId,
+                                              @RequestBody Set<UserDto> userDto) {
+        if (projectId != null && !userDto.isEmpty()) {
+            return projectService.addMemberToProject(projectId, userDto);
         }
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Bad Request");
     }
 
     @GetMapping(value = "/project/withinDateRange")
     public ResponseEntity<?> projectsWithinDateRangeRequest(@RequestParam("StartDateTime") String startDateTime,
-                                                            @RequestParam("EndDateTime") String endDateTime){
+                                                            @RequestParam("EndDateTime") String endDateTime) {
         try {
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss");
 

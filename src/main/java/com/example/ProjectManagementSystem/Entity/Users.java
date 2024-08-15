@@ -13,9 +13,9 @@ import java.util.Set;
 @NoArgsConstructor
 @Builder
 @Table(name = "users_tbl")
-public class Users  extends BaseModel{
+public class Users extends BaseModel {
 
-    @Column(name = "username",unique = true)
+    @Column(name = "username", unique = true)
     private String username;
 
     @Column(name = "password")

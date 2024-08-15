@@ -53,7 +53,7 @@ public class ProjectReportService {
 
         }
         String reportPath = path + "\\pms_report.pdf";
-        byte[] pdfBytes = getFileAsByteArray(reportPath) ;
+        byte[] pdfBytes = getFileAsByteArray(reportPath);
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_PDF);

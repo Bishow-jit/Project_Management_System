@@ -9,7 +9,7 @@ public enum StatusEnum {
 
     private final Integer statusValue;
 
-     StatusEnum(Integer statusValue){
+    StatusEnum(Integer statusValue) {
         this.statusValue = statusValue;
     }
 

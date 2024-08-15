@@ -28,6 +28,7 @@ public class SpringSecurityConfig {
 
     @Autowired
     private JwtAuthenticationFilter jwtAuthenticationFilter;
+
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         return http
@@ -35,10 +36,10 @@ public class SpringSecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(
                         auth -> {
-                            auth.requestMatchers( "api/v1/login","api/v1/registration","/swagger-ui.html/**","swagger-ui/**",
+                            auth.requestMatchers("api/v1/login", "api/v1/registration", "/swagger-ui.html/**", "swagger-ui/**",
                                     "/v3/api-docs/**").permitAll();
                             auth.anyRequest().authenticated();
-                        }) .exceptionHandling(exceptionHandling ->
+                        }).exceptionHandling(exceptionHandling ->
                         exceptionHandling.authenticationEntryPoint((request, response, authException) ->
                                 response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Unauthorized")
                         )
